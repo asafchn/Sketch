@@ -1,20 +1,16 @@
 <script setup lang="ts">
 defineEmits(["click"]);
-withDefaults(defineProps<{ isSelected: boolean; type: string }>(), {
+withDefaults(defineProps<{ isSelected: boolean }>(), {
   isSelected: false,
-  type: "action",
 });
 </script>
+
 <template>
-  <div
-    v-if="type === 'action'"
-    class="action"
-    @click="$emit('click')"
-    :class="{ selected: isSelected }"
-  >
+  <div class="action" @click="$emit('click')" :class="{ selected: isSelected }">
     <slot></slot>
   </div>
 </template>
+
 <style scoped>
 .action {
   display: flex;

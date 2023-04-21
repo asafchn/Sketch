@@ -12,8 +12,17 @@ export function useCanvasFunction() {
     mode,
     isDrawing,
   } = storeToRefs(useStore());
-  function startPainting() {
+
+  const startX = ref(0);
+  const startY = ref(0);
+
+  function startPainting(event: MouseEvent) {
     isDrawing.value = true;
+    startX.value = event.clientX;
+    startY.value = event.clientY;
+    if (mode.value === "pen") {
+      draw(event);
+    }
   }
 
   function clearCanvas() {
@@ -26,49 +35,46 @@ export function useCanvasFunction() {
       );
     }
   }
-  function mouseMove(event: MouseEvent) {
-    switch (mode.value) {
-      case "pen":
-        draw(event);
-        break;
-      case "eraser":
-        erase(event);
-        break;
-      default:
-        draw(event);
+
+  function getInputModel(modelType: string) {
+    if (modelType === "lineWidth") {
+      return lineWidth;
     }
   }
 
-  function erase(event: MouseEvent) {
-    if (!isDrawing.value || !canvasContext.value) {
-      return;
+  function mouseMove(event: MouseEvent) {
+    switch (mode.value) {
+      case "pen":
+        if (canvasContext.value) {
+          canvasContext.value.globalCompositeOperation = "source-over";
+        }
+        break;
+      case "eraser":
+        if (canvasContext.value) {
+          canvasContext.value.globalCompositeOperation = "destination-out";
+        }
+        break;
+      default:
+        if (canvasContext.value) {
+          canvasContext.value.globalCompositeOperation = "source-over";
+        }
+        break;
     }
-    canvasContext.value.globalCompositeOperation = "destination-out";
-    if (canvasClientRect.value) {
-      canvasContext.value.arc(
-        event.clientX - canvasClientRect.value.x,
-        event.clientY - canvasClientRect.value.y,
-        lineWidth.value,
-        0,
-        Math.PI * 2,
-        false
-      );
-      canvasContext.value.fill();
-    }
+    draw(event);
   }
+
   function draw(event: MouseEvent) {
     if (!isDrawing.value || !canvasContext.value) {
       return;
     }
-    canvasContext.value.globalCompositeOperation = "source-over";
     canvasContext.value.lineWidth = lineWidth.value;
-    canvasContext.value.strokeStyle = color.value;
     canvasContext.value.lineCap = "round";
     if (canvas.value && canvasClientRect.value) {
       canvasContext.value.lineTo(
         event.clientX - canvasClientRect.value.x,
         event.clientY - canvasClientRect.value.y
       );
+      canvasContext.value.strokeStyle = color.value;
       canvasContext.value.stroke();
     }
   }
@@ -83,13 +89,14 @@ export function useCanvasFunction() {
       canvasContext.value.beginPath();
     }
   }
+
   return {
     clearCanvas,
     stopPainting,
     startPainting,
     draw,
     changeMode,
-    erase,
+    getInputModel,
     mouseMove,
   };
 }

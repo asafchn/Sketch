@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import {
-  onMounted,
-  ref,
-  watch,
-  type Ref,
-  onBeforeMount,
-  onUnmounted,
-} from "vue";
+import { onMounted, ref, onUnmounted } from "vue";
 import { useStore } from "@/stores/defaultStore";
 import { storeToRefs } from "pinia";
 import { useCanvasFunction } from "../composable/useCanvasFunctions";
@@ -21,6 +14,7 @@ function changeCanvasSize() {
     canvas.value.height = canvasClientRect.value.height;
   }
 }
+
 function initCanvasSize() {
   if (canvasRef.value) {
     canvasClientRect.value = canvasRef.value.getBoundingClientRect();
@@ -29,6 +23,7 @@ function initCanvasSize() {
     canvas.value = canvasRef.value;
   }
 }
+
 onMounted(() => {
   if (canvasRef.value) {
     canvasContext.value = canvasRef.value.getContext("2d");
@@ -36,6 +31,7 @@ onMounted(() => {
   }
   window.addEventListener("resize", changeCanvasSize);
 });
+
 onUnmounted(() => {
   document.removeEventListener("resize", () => {
     changeCanvasSize;
@@ -55,8 +51,10 @@ onUnmounted(() => {
 <style scoped>
 .canvas {
   display: flex;
+  cursor: crosshair;
   height: 80%;
+  background-color: var(--white-text);
   width: 80%;
-  border: 1px solid black;
+  border-radius: 4px;
 }
 </style>

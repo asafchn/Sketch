@@ -16,6 +16,7 @@ body {
 </style>
 <style scoped>
 .container {
+  background-color: var(--color-cream);
   flex-direction: column;
   display: flex;
   justify-content: center;
